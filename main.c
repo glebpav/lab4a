@@ -6,10 +6,10 @@
 int main() {
     int operationIdx, exitOperationIdx;
     ResponsesTypes operationResponse;
-    Node treeRoot;
+    Node *treeRoot;
 
     exitOperationIdx = getExitOperationIdx();
-    treeRoot = initLocaleTable(MAX_TABLE_SIZE);
+    treeRoot = NULL;
 
     do {
         operationIdx = selectOperation(commandsMessages, countOfCommands);

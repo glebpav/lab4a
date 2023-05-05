@@ -16,7 +16,7 @@ const char *commandsMessages[] = {
         "9. Exit program =("
 };
 
-ResponsesTypes (*commandsPointers[])(Node *) = {
+ResponsesTypes (*commandsPointers[])(Node **) = {
         addNewItem,
         deleteItem,
         directBypass,

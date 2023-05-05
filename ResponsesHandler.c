@@ -17,6 +17,8 @@ char *getResponseMessage(ResponsesTypes responsesTypes) {
             return strdup("fileDescriptor format is incorrect");
         case UNKNOWN_KEY_EXCEPTION:
             return strdup("given key or version doesn't exist");
+        case EMPTY_FIELD_EXCEPTION:
+            return strdup("passed field is empty");
         case COMMON_EXCEPTION:
             return strdup("stupid error");
         case SUCCESS_RESPONSE:

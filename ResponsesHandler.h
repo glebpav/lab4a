@@ -12,7 +12,9 @@ typedef enum ResponsesTypes {
     UNKNOWN_KEY_EXCEPTION,
     COMMON_EXCEPTION,
     FILE_EXCEPTION,
-    SUCCESS_RESPONSE
+    EMPTY_FIELD_EXCEPTION,
+    SUCCESS_RESPONSE,
+    EXIT_RESPONSE
 } ResponsesTypes;
 
 bool isException(ResponsesTypes response);
