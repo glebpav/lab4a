@@ -19,7 +19,7 @@ const char *commandsMessages[] = {
 ResponsesTypes (*commandsPointers[])(Node **) = {
         addNewItem,
         deleteItem,
-        directBypass,
+        directBypassCommand,
         directBypassSpecial,
         searchItem,
         searchItemSpecial,

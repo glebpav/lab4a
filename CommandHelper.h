@@ -8,7 +8,7 @@ ResponsesTypes addNewItem(Node **treeRoot);
 
 ResponsesTypes deleteItem(Node **treeRoot);
 
-ResponsesTypes directBypass(Node **treeRoot);
+ResponsesTypes directBypassCommand(Node **treeRoot);
 
 ResponsesTypes directBypassSpecial(Node **treeRoot);
 

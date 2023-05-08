@@ -2,6 +2,13 @@
 #include "ResponsesHandler.h"
 #include "BinTree.h"
 #include "DialogHelper.h"
+#include "MyVector.h"
+
+// gcc main.c -o main BinTree.c ResponsesHandler.c CommandHelper.c DialogHelper.c FileHelper.c Utils.c MyVector.c
+
+int getNum(int num) {
+    return num;
+}
 
 int main() {
     int operationIdx, exitOperationIdx;
