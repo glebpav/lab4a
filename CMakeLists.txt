@@ -3,4 +3,4 @@ project(lab4a C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(lab4a main.c BinTree.c BinTree.h ResponsesHandler.c ResponsesHandler.h DialogHelper.c DialogHelper.h Utils.c Utils.h CommandHelper.c CommandHelper.h FileHelper.c FileHelper.h MyVector.c MyVector.h)
+add_executable(lab4a main.c controller/BinTree.c controller/BinTree.h view/ResponsesHandler.c view/ResponsesHandler.h view/DialogHelper.c view/DialogHelper.h Utils.c Utils.h view/CommandHelper.c view/CommandHelper.h model/FileHelper.c model/FileHelper.h model/MyVector.c model/MyVector.h)

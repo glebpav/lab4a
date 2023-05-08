@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "Utils.h"
 #include "stdio.h"
-#include "ResponsesHandler.h"
+#include "view/ResponsesHandler.h"
 
 int getInt(int *var) {
     int clearBuffer, res = scanf("%d", var);
@@ -11,7 +11,7 @@ int getInt(int *var) {
 
 char *getLine(void) {
     char *line = malloc(100), *linep = line;
-    size_t lenmax = 100, len = lenmax;
+    size_t lenMax = 100, len = lenMax;
     int c;
 
     if (line == NULL)
@@ -19,13 +19,14 @@ char *getLine(void) {
 
     for (;;) {
         c = fgetc(stdin);
-        if (c == EOF)
-            break;
+        if (c == EOF) {
+            free(line);
+            return NULL;
+        }
 
         if (--len == 0) {
-            len = lenmax;
-            char *linen = realloc(linep, lenmax *= 2);
-
+            len = lenMax;
+            char *linen = realloc(linep, lenMax *= 2);
             if (linen == NULL) {
                 free(linep);
                 return NULL;
@@ -34,8 +35,7 @@ char *getLine(void) {
             linep = linen;
         }
 
-        if ((*line++ = c) == '\n')
-            break;
+        if ((*line++ = c) == '\n') break;
     }
     *line--;
     *line = '\0';
@@ -45,7 +45,7 @@ char *getLine(void) {
 ResponsesTypes getSaveStingValue(char **value, char *messageToUser) {
     printf("%s", messageToUser);
     *value = getLine();
-    return value == NULL ? EXIT_RESPONSE : SUCCESS_RESPONSE;
+    return (value == NULL) ? EXIT_RESPONSE : SUCCESS_RESPONSE;
 }
 
 ResponsesTypes getSaveIntValue(int *value, char *messageToUser) {

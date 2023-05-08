@@ -1,8 +1,8 @@
 #ifndef LAB4A_FILEHELPER_H
 #define LAB4A_FILEHELPER_H
 
-#include "ResponsesHandler.h"
-#include "BinTree.h"
+#include "../view/ResponsesHandler.h"
+#include "../controller/BinTree.h"
 
 ResponsesTypes readFile(char *fileName, char ***outputString, int *outputStringLen);
 

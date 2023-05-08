@@ -1,8 +1,8 @@
 #ifndef LAB4A_BINTREE_H
 #define LAB4A_BINTREE_H
 
-#include "ResponsesHandler.h"
-#include "MyVector.h"
+#include "../view/ResponsesHandler.h"
+#include "../model/MyVector.h"
 
 typedef struct Node {
     char *key;
@@ -13,10 +13,10 @@ typedef struct Node {
 } Node;
 
 Node *initTree();
-ResponsesTypes freeTree(Node **treeRoot);
+void freeTree(Node *treeRoot);
 Vector *getNode(Node **TreeRoot, char *requiredKey);
 ResponsesTypes addNode(Node **treeRoot, char *key, char *value);
-ResponsesTypes deleteNode(Node **treeRoot, char *deletingItemKey);
+ResponsesTypes deleteNode(Node **deletingNodePtr);
 Vector *directBypass(Node *treeRoot);
 
 #endif //LAB4A_BINTREE_H

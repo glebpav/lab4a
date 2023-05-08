@@ -1,7 +1,7 @@
 #ifndef LAB4A_UTILS_H
 #define LAB4A_UTILS_H
 
-#include "ResponsesHandler.h"
+#include "view/ResponsesHandler.h"
 
 ResponsesTypes getSaveIntValue(int *value, char *messageToUser);
 

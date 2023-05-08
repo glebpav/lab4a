@@ -1,7 +1,7 @@
 #ifndef LAB4A_DIALOGHELPER_H
 #define LAB4A_DIALOGHELPER_H
 
-#include "BinTree.h"
+#include "../controller/BinTree.h"
 #include "CommandHelper.h"
 
 const char *commandsMessages[] = {

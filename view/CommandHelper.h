@@ -2,7 +2,7 @@
 #define LAB4A_COMMANDHELPER_H
 
 #include "ResponsesHandler.h"
-#include "BinTree.h"
+#include "../controller/BinTree.h"
 
 ResponsesTypes addNewItem(Node **treeRoot);
 

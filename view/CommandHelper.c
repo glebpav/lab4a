@@ -2,16 +2,16 @@
 #include <stdio.h>
 #include <string.h>
 #include "CommandHelper.h"
-#include "Utils.h"
-#include "FileHelper.h"
+#include "../Utils.h"
+#include "../model/FileHelper.h"
 
 ResponsesTypes addNewItem(Node **treeRoot) {
     char *newKey, *newValue;
 
     if (!getSaveStingValue(&newKey, "Please, input new KEY\n"))
-        return exitProgram(treeRoot);
+        return EXIT_RESPONSE;
     if (!getSaveStingValue(&newValue, "Please, input new VALUE\n"))
-        return exitProgram(treeRoot);
+        return EXIT_RESPONSE;
 
     ResponsesTypes response = addNode(treeRoot, newKey, newValue);
 
@@ -28,21 +28,30 @@ ResponsesTypes deleteItem(Node **treeRoot) {
 
     char *deletingNodeKey;
     if (!getSaveStingValue(&deletingNodeKey, "Please, input KEY of deleting Node\n"))
-        return exitProgram(treeRoot);
+        return EXIT_RESPONSE;
 
     Vector *arrayOfDeletingNodes = getNode(treeRoot, deletingNodeKey);
+    Node **deletingItemPtr = NULL;
 
+    if (arrayOfDeletingNodes == NULL) {
+        throughException(UNKNOWN_KEY_EXCEPTION);
+        return SUCCESS_RESPONSE;
+    }
     if (arrayOfDeletingNodes->arrayLength != 1) {
         int groupItemIdx;
-        if (!getSaveIntValue(&groupItemIdx, "Please, input idx of deleting Item\n"))
-            return exitProgram(treeRoot);
+        if (!getSaveIntValue(&groupItemIdx, "Please, input IDX of deleting Item\n"))
+            return EXIT_RESPONSE;
         if (groupItemIdx < 0 || groupItemIdx >= arrayOfDeletingNodes->arrayLength){
             throughException(INPUT_NOT_IN_RANGE_EXCEPTION);
             return SUCCESS_RESPONSE;
         }
 
-    }
+        deletingItemPtr = getItemFromVector(*arrayOfDeletingNodes, groupItemIdx);
+    } else deletingItemPtr = getItemFromVector(*arrayOfDeletingNodes, 0);
 
+    deleteNode(deletingItemPtr);
+
+    destroyVector(arrayOfDeletingNodes);
     return SUCCESS_RESPONSE;
 }
 
@@ -54,8 +63,8 @@ ResponsesTypes directBypassCommand(Node **treeRoot) {
     else {
         printf("Direct bypass:\n");
         for (int i = 0; i < nodeArray->arrayLength; ++i) {
-            Node *node = getItemFromVector(*nodeArray, i);
-            printf("key = %s; data = %s\n", node->key, node->data);
+            Node **node = getItemFromVector(*nodeArray, i);
+            printf("key = %s; data = %s\n", (*node)->key, (*node)->data);
         }
         destroyVector(nodeArray);
     }
@@ -76,16 +85,15 @@ ResponsesTypes searchItem(Node **treeRoot) {
 
     Vector *foundNodeArray = getNode(treeRoot, requiredKey);
 
-
     if (foundNodeArray != NULL) {
         if (foundNodeArray->arrayLength == 1) {
-            Node *node = getItemFromVector(*foundNodeArray, 0);
-            printf("key = %s  data = %s\n", node->key, node->data);
+            Node **node = getItemFromVector(*foundNodeArray, 0);
+            printf("key = %s  data = %s\n", (*node)->key, (*node)->data);
         } else {
             printf("key = %s  data:[ ", requiredKey);
             for (int i = 0; i < foundNodeArray->arrayLength; ++i) {
-                Node *node = getItemFromVector(*foundNodeArray, i);
-                printf("%s, ", node->data);
+                Node **node = getItemFromVector(*foundNodeArray, i);
+                printf("%s, ", (*node)->data);
             }
             printf("]\n");
         }
@@ -103,9 +111,10 @@ ResponsesTypes searchItemSpecial(Node **treeRoot) {
 }
 
 void printTreeLevel(Node *treeRoot, int level) {
-    if (treeRoot) {
+    if (treeRoot != NULL) {
         printTreeLevel(treeRoot->left, level + 1);
         for (int i = 0; i < level; i++) printf("   ");
+        // printf("%p; ", treeRoot);
         printf("%s\n", treeRoot->key);
         printTreeLevel(treeRoot->right, level + 1);
     }
@@ -137,19 +146,15 @@ ResponsesTypes readTreeFromFile(Node **treeRoot) {
     }
 
     response = getTreeFromString(stringArray, stringArrayLen, treeRoot);
-    if (isException(response)) {
-        throughException(response);
-    }
 
     for (int i = 0; i < stringArrayLen; ++i) free(stringArray[i]);
     free(stringArray);
+
+    if (isException(response)) throughException(response);
 
     return SUCCESS_RESPONSE;
 }
 
 ResponsesTypes exitProgram(Node **treeRoot) {
-    freeTree(treeRoot);
-    printf("Goodbye, dear!\n");
-    // TODO: free table
     return EXIT_RESPONSE;
 }

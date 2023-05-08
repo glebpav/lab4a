@@ -3,7 +3,7 @@
 #include "FileHelper.h"
 #include "string.h"
 #include "stdlib.h"
-#include "BinTree.h"
+#include "../controller/BinTree.h"
 
 ResponsesTypes readFile(char *fileName, char ***outputString, int *outputStringLen) {
     FILE *fp;
@@ -44,6 +44,7 @@ ResponsesTypes readFile(char *fileName, char ***outputString, int *outputStringL
         fclose(fp);
     }
     free(item);
+    return SUCCESS_RESPONSE;
 }
 
 ResponsesTypes getTreeFromString(char **stringArray, int stringArrayLen, Node **treeRoot) {

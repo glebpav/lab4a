@@ -18,7 +18,8 @@ Vector *initVectorPtr(int typeSize) {
 void addItemToVector(Vector *vector, void *item) {
     vector->arrayLength += 1;
     vector->array = realloc(vector->array, sizeof(void *) * vector->arrayLength);
-    vector->array[vector->arrayLength - 1] = calloc(1, sizeof(*item));
+    printf("size of Item: %llu\n", sizeof(*item));
+    vector->array[vector->arrayLength - 1] = calloc(1, vector->typeSize);
     memcpy(vector->array[vector->arrayLength - 1], item, vector->typeSize);
 }
 
@@ -29,7 +30,7 @@ void deleteItemFromVector(Vector *vector, int deletingItemIdx) {
     for (int i = deletingItemIdx; i < vector->arrayLength; ++i)
         vector->array[i] = vector->array[i + 1];
 
-    vector->array = realloc(vector->array, vector->typeSize * vector->arrayLength);
+    vector->array = realloc(vector->array, sizeof(void *) * vector->arrayLength);
 }
 
 void setItemVector(Vector *vector, void *data){
@@ -47,4 +48,5 @@ void destroyVector(Vector *vector) {
 
     vector->arrayLength = 0;
     free(vector->array);
+    free(vector);
 }
