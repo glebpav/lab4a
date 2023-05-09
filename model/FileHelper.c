@@ -27,7 +27,7 @@ ResponsesTypes readFile(char *fileName, char ***outputString, int *outputStringL
         int ret = fscanf(fp, "%s", item);
         if (ret == 1) {
             *outputString = realloc(*outputString, (1 + *outputStringLen) * sizeof(char*));
-            (*outputString)[*outputStringLen] = calloc(1,(1 + strlen(item)) * sizeof(char));
+            // (*outputString)[*outputStringLen] = calloc(1,(1 + strlen(item)) * sizeof(char));
             (*outputString)[*outputStringLen] = strdup(item);
             *outputStringLen += 1;
         } else if (errno != 0) {

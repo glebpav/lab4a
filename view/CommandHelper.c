@@ -31,6 +31,7 @@ ResponsesTypes deleteItem(Node **treeRoot) {
         return EXIT_RESPONSE;
 
     Vector *arrayOfDeletingNodes = getNode(treeRoot, deletingNodeKey);
+    free(deletingNodeKey);
     Node **deletingItemPtr = NULL;
 
     if (arrayOfDeletingNodes == NULL) {

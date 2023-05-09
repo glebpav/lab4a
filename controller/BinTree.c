@@ -96,26 +96,40 @@ ResponsesTypes addNode(Node **treeRoot, char *key, char *value) {
 ResponsesTypes deleteNode(Node **deletingNodePtr) {
 
     Node *deletingNode = *deletingNodePtr;
-    // in case node is root
-    if ((*deletingNodePtr)->parent == NULL) {
-
-    }
+    // TODO: in case node is root ...
 
     // in case NO child nodes
-    if (deletingNode->right == NULL && deletingNode->left == NULL) {
+    if (deletingNode->right == NULL && deletingNode->left == NULL && deletingNode->parent != NULL) {
         printf("in case NO child nodes\n");
+        // printf("set address to null: %p\n", deletingNode);
+        // (*deletingNodePtr) = NULL;
+        // free(deletingNode);
+        int compRes = strcmp(deletingNode->parent->key, deletingNode->key);
+
         free(deletingNode->key);
         free(deletingNode->data);
-        // printf("set address to null: %p\n", deletingNode);
-        free(deletingNode);
-        (*deletingNodePtr) = NULL;
+
+        if (compRes < 0) {
+            Node *bufNode = deletingNode->parent;
+            free(bufNode->right);
+            bufNode->right = NULL;
+        } else {
+            Node *bufNode = deletingNode->parent;
+            free(bufNode->left);
+            bufNode->left = NULL;
+        }
     }
 
     // in case NO right child
     else if (deletingNode->right == NULL) {
+        printf("in case NO right child\n");
+        free(deletingNode->key);
         deletingNode->key = deletingNode->left->key;
+        free(deletingNode->data);
         deletingNode->data = deletingNode->left->data;
-        deletingNode->left = deletingNode->left->left;
+        Node *bufNode = deletingNode->right->right;
+        free(deletingNode->left);
+        deletingNode->left = bufNode;
         if (deletingNode->left != NULL) deletingNode->left->parent = deletingNode;
         deletingNode->right = deletingNode->left->right;
         if (deletingNode->right != NULL) deletingNode->right->parent = deletingNode;
@@ -123,24 +137,35 @@ ResponsesTypes deleteNode(Node **deletingNodePtr) {
 
     // in case NO left child
     else if (deletingNode->left == NULL) {
+        printf("in case NO left child\n");
+        free(deletingNode->key);
         deletingNode->key = deletingNode->right->key;
+        free(deletingNode->data);
         deletingNode->data = deletingNode->right->data;
         deletingNode->left = deletingNode->right->left;
         if (deletingNode->left != NULL) deletingNode->right->parent = deletingNode;
-        deletingNode->right = deletingNode->right->right;
+        Node *bufNode = deletingNode->right->right;
+        free(deletingNode->right);
+        deletingNode->right = bufNode;
         if (deletingNode->right != NULL) deletingNode->right->parent = deletingNode;
     }
 
     // in case TWO children
     else {
+        printf("in case TWO children\n");
         // find min in right subTree
-        Node **nodeSuccessorPtr = (&deletingNode->right);
+        Node **nodeSuccessorPtr = &(deletingNode->right);
         while((*nodeSuccessorPtr)->left != NULL) {
             (*nodeSuccessorPtr) = (*nodeSuccessorPtr)->left;
         }
         // replace deleting node data
-        deletingNode->key = (*nodeSuccessorPtr)->key;
-        deletingNode->data = (*nodeSuccessorPtr)->data;
+        size_t sizeOfKey = (1 + strlen((*nodeSuccessorPtr)->key)) * sizeof(char);
+        size_t sizeOfData = (1 + strlen((*nodeSuccessorPtr)->data)) * sizeof(char);
+
+        deletingNode->key = realloc(deletingNode->key, sizeOfKey);
+        deletingNode->data = realloc(deletingNode->data, sizeOfData);
+        memcpy(deletingNode->key, (*nodeSuccessorPtr)->key, sizeOfKey);
+        memcpy(deletingNode->data, (*nodeSuccessorPtr)->data, sizeOfData);
         deleteNode(nodeSuccessorPtr);
     }
 
