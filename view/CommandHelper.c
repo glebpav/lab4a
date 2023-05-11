@@ -5,6 +5,16 @@
 #include "../Utils.h"
 #include "../model/FileHelper.h"
 
+void printTreeLevel(Node *treeRoot, int level) {
+    if (treeRoot != NULL) {
+        printTreeLevel(treeRoot->left, level + 1);
+        for (int i = 0; i < level; i++) printf("   ");
+        // printf("%p; ", treeRoot);
+        printf("%s\n", treeRoot->key);
+        printTreeLevel(treeRoot->right, level + 1);
+    }
+}
+
 ResponsesTypes addNewItem(Node **treeRoot) {
     char *newKey, *newValue;
 
@@ -81,9 +91,30 @@ ResponsesTypes directBypassCommand(Node **treeRoot) {
 ResponsesTypes directBypassSpecial(Node **treeRoot) {
 
     char *subStr;
+    Vector *nodeArray = directBypass(*treeRoot);
+    if (nodeArray == NULL) {
+        printf("Tree is empty\n");
+        return SUCCESS_RESPONSE;
+    }
 
     if (!getSaveStingValue(&subStr, "Please, input SUBSTR for key\n"))
         return EXIT_RESPONSE;
+
+    bool isAnyPrinted = false;
+    for (int i = 0; i < nodeArray->arrayLength; ++i) {
+        Node **checkingNode = getItemFromVector(*nodeArray, i);
+        // printf("item %s: %d\n", (*checkingNode)->key, strcmpForSubStr(subStr, (*checkingNode)->key));
+        if (strcmpForSubStr(subStr, (*checkingNode)->key) == 0) {
+            if (isAnyPrinted == false) printf("Your special bypass:\n");
+            printf("key = %s; data = %s\n", (*checkingNode)->key, (*checkingNode)->data);
+            isAnyPrinted = true;
+        }
+    }
+
+    if (isAnyPrinted == false) printf("Оooops... No items with <%s> sub string\n", subStr);
+
+    free(subStr);
+    destroyVector(nodeArray);
 
     return SUCCESS_RESPONSE;
 }
@@ -146,22 +177,47 @@ ResponsesTypes searchItemSpecial(Node **treeRoot) {
         Vector *dif1 = getStringDifference(requiredKey, nodeMin->key);
         Vector *dif2 = getStringDifference(requiredKey, nodeMax->key);
 
+        /*printf("dif1: ");
+        for (int i = 0; i < dif1->arrayLength; ++i) {
+            int *q = getItemFromVector(*dif1, i);
+            printf("%d, ", *q);
+        }
+        printf("\n");
+
+        printf("dif2: ");
+        for (int i = 0; i < dif1->arrayLength; ++i) {
+            int *q = getItemFromVector(*dif2, i);
+            printf("%d, ", *q);
+        }
+        printf("\n");*/
+
+
         int difIdx = 0;
         int finalDif = 0;
-        while (dif1->arrayLength < difIdx && dif2->arrayLength < difIdx) {
+        while (dif1->arrayLength > difIdx && dif2->arrayLength > difIdx) {
             int *item1 = getItemFromVector(*dif1, difIdx);
             int *item2 = getItemFromVector(*dif2, difIdx);
-            finalDif = *item1 - *item2;
+            finalDif = abs(*item1) - abs(*item2);
             difIdx += 1;
             if (finalDif != 0) break;
         }
 
+        // printf("final dif: %d\n", finalDif);
+
         if (finalDif > 0) {
             printingNodes = minNodeArray;
             destroyVector(maxNodeArray);
-        } else {
+        } else if (finalDif < 0) {
             printingNodes = maxNodeArray;
             destroyVector(minNodeArray);
+        } else {
+            printingNodes = initVectorPtr(sizeof(Node));
+            for (int i = 0; i < minNodeArray->arrayLength; ++i)
+                addItemToVector(printingNodes, getItemFromVector(*minNodeArray, i));
+            for (int i = 0; i < maxNodeArray->arrayLength; ++i)
+                addItemToVector(printingNodes, getItemFromVector(*maxNodeArray, i));
+            destroyVector(minNodeArray);
+            destroyVector(maxNodeArray);
         }
 
         destroyVector(dif2);
@@ -188,16 +244,6 @@ ResponsesTypes searchItemSpecial(Node **treeRoot) {
 
     free(requiredKey);
     return SUCCESS_RESPONSE;
-}
-
-void printTreeLevel(Node *treeRoot, int level) {
-    if (treeRoot != NULL) {
-        printTreeLevel(treeRoot->left, level + 1);
-        for (int i = 0; i < level; i++) printf("   ");
-        // printf("%p; ", treeRoot);
-        printf("%s\n", treeRoot->key);
-        printTreeLevel(treeRoot->right, level + 1);
-    }
 }
 
 ResponsesTypes printTree(Node **treeRoot) {

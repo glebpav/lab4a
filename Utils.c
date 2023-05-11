@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "Utils.h"
 #include "stdio.h"
 #include "view/ResponsesHandler.h"
@@ -59,10 +60,11 @@ ResponsesTypes getSaveIntValue(int *value, char *messageToUser) {
     return SUCCESS_RESPONSE;
 }
 
-int strcmpForSubStr(char *s1, char *s2) {
+int strcmpForSubStr(char *subStr, char *checkingStr) {
     int i = 0;
-    while (s1[i] != '\0' && s2[i] != '\0') {
-        if (s1[i] != s2[i]) return 1;
+    if (strlen(subStr) > strlen(checkingStr)) return 1;
+    while (subStr[i] != '\0' && checkingStr[i] != '\0') {
+        if (subStr[i] != checkingStr[i]) return 1;
         i++;
     }
     return 0;

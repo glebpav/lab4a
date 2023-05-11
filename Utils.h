@@ -8,7 +8,7 @@ ResponsesTypes getSaveIntValue(int *value, char *messageToUser);
 
 ResponsesTypes getSaveStingValue(char **value, char *messageToUser);
 
-int strcmpForSubStr(char *s1, char *s2);
+int strcmpForSubStr(char *subStr, char *checkingStr);
 
 Vector *getStringDifference(char *str1, char *str2);
 
