@@ -18,6 +18,8 @@ ResponsesTypes searchItemSpecial(Node **treeRoot);
 
 ResponsesTypes printTree(Node **treeRoot);
 
+ResponsesTypes printTreeInGraphViz(Node **treeRoot);
+
 ResponsesTypes readTreeFromFile(Node **treeRoot);
 
 ResponsesTypes exitProgram(Node **treeRoot);

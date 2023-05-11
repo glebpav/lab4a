@@ -5,15 +5,16 @@
 #include "CommandHelper.h"
 
 const char *commandsMessages[] = {
-        "1. Add new Item",
-        "2. Delete Item",
-        "3. Direct bypass",
-        "4. Direct bypass by sub string (*)",
-        "5. Search Item",
-        "6. Search the most different Item (*)",
-        "7. Print tree",
-        "8. Read tree from file",
-        "9. Exit program =("
+        " 1. Add new Item",
+        " 2. Delete Item",
+        " 3. Direct bypass",
+        " 4. Direct bypass by sub string (*)",
+        " 5. Search Item",
+        " 6. Search the most different Item (*)",
+        " 7. Print tree in console",
+        " 8. Print tree in graphvis",
+        " 9. Read tree from file",
+        "10. Exit program =("
 };
 
 ResponsesTypes (*commandsPointers[])(Node **) = {
@@ -24,6 +25,7 @@ ResponsesTypes (*commandsPointers[])(Node **) = {
         searchItem,
         searchItemSpecial,
         printTree,
+        printTreeInGraphViz,
         readTreeFromFile,
         exitProgram
 };

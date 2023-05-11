@@ -4,7 +4,7 @@
 #include "ResponsesHandler.h"
 
 int getExitOperationIdx() {
-    return 8;
+    return 9;
 }
 
 int selectOperation(const char *commandsMessages[], int countOfMessages) {

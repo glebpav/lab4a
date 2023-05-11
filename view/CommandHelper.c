@@ -1,9 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include "CommandHelper.h"
 #include "../Utils.h"
 #include "../model/FileHelper.h"
+#include "../model/GrpahVisHelper.h"
 
 void printTreeLevel(Node *treeRoot, int level) {
     if (treeRoot != NULL) {
@@ -23,10 +25,14 @@ ResponsesTypes addNewItem(Node **treeRoot) {
     if (!getSaveStingValue(&newValue, "Please, input new VALUE\n"))
         return EXIT_RESPONSE;
 
+    clock_t startTime = clock();
     ResponsesTypes response = addNode(treeRoot, newKey, newValue);
+    clock_t spendTime = (clock() - startTime) * 1000 / CLOCKS_PER_SEC;
+    printf("Spend: %ld ms\n", spendTime);
 
     if (isException(response)) throughException(response);
     else printSuccessMessage(response);
+
 
     free(newKey);
     free(newValue);
@@ -40,7 +46,9 @@ ResponsesTypes deleteItem(Node **treeRoot) {
     if (!getSaveStingValue(&deletingNodeKey, "Please, input KEY of deleting Node\n"))
         return EXIT_RESPONSE;
 
+    clock_t startTime = clock();
     Vector *arrayOfDeletingNodes = getNode(treeRoot, deletingNodeKey, true);
+    clock_t spendTime = (clock() - startTime) * 1000 / CLOCKS_PER_SEC;
     free(deletingNodeKey);
     Node **deletingItemPtr = NULL;
 
@@ -65,7 +73,10 @@ ResponsesTypes deleteItem(Node **treeRoot) {
         deletingItemPtr = getItemFromVector(*arrayOfDeletingNodes, groupItemIdx);
     } else deletingItemPtr = getItemFromVector(*arrayOfDeletingNodes, 0);
 
+    startTime = clock();
     deleteNode(deletingItemPtr);
+    spendTime += (clock() - startTime) * 1000 / CLOCKS_PER_SEC;
+    printf("Spend: %ld ms\n", spendTime);
 
     destroyVector(arrayOfDeletingNodes);
     return SUCCESS_RESPONSE;
@@ -73,15 +84,21 @@ ResponsesTypes deleteItem(Node **treeRoot) {
 
 ResponsesTypes directBypassCommand(Node **treeRoot) {
 
+    clock_t startTime = clock();
     Vector *nodeArray = directBypass(*treeRoot);
+    clock_t spendTime = (clock() - startTime) * 1000 / CLOCKS_PER_SEC;
 
     if (nodeArray == NULL) printf("Tree is empty\n");
     else {
         printf("Direct bypass:\n");
+        startTime = clock();
         for (int i = 0; i < nodeArray->arrayLength; ++i) {
             Node **node = getItemFromVector(*nodeArray, i);
             printf("key = %s; data = %s\n", (*node)->key, (*node)->data);
         }
+        spendTime += (clock() - startTime) * 1000 / CLOCKS_PER_SEC;
+        printf("Spend: %ld ms\n", spendTime);
+
         destroyVector(nodeArray);
     }
 
@@ -91,7 +108,10 @@ ResponsesTypes directBypassCommand(Node **treeRoot) {
 ResponsesTypes directBypassSpecial(Node **treeRoot) {
 
     char *subStr;
+    clock_t startTime = clock();
     Vector *nodeArray = directBypass(*treeRoot);
+    clock_t spendTime = (clock() - startTime) * 1000 / CLOCKS_PER_SEC;
+
     if (nodeArray == NULL) {
         printf("Tree is empty\n");
         return SUCCESS_RESPONSE;
@@ -100,6 +120,7 @@ ResponsesTypes directBypassSpecial(Node **treeRoot) {
     if (!getSaveStingValue(&subStr, "Please, input SUBSTR for key\n"))
         return EXIT_RESPONSE;
 
+    startTime = clock();
     bool isAnyPrinted = false;
     for (int i = 0; i < nodeArray->arrayLength; ++i) {
         Node **checkingNode = getItemFromVector(*nodeArray, i);
@@ -110,9 +131,11 @@ ResponsesTypes directBypassSpecial(Node **treeRoot) {
             isAnyPrinted = true;
         }
     }
+    spendTime += (clock() - startTime) * 1000 / CLOCKS_PER_SEC;
 
     if (isAnyPrinted == false) printf("Оooops... No items with <%s> sub string\n", subStr);
 
+    printf("Spend: %ld ms\n", spendTime);
     free(subStr);
     destroyVector(nodeArray);
 
@@ -125,7 +148,9 @@ ResponsesTypes searchItem(Node **treeRoot) {
     if (!getSaveStingValue(&requiredKey, "Please, input required KEY\n"))
         return EXIT_RESPONSE;
 
+    clock_t startTime = clock();
     Vector *foundNodeArray = getNode(treeRoot, requiredKey, true);
+    clock_t spendTime = (clock() - startTime) * 1000 / CLOCKS_PER_SEC;
 
     if (foundNodeArray != NULL) {
         if (foundNodeArray->arrayLength == 1) {
@@ -144,6 +169,9 @@ ResponsesTypes searchItem(Node **treeRoot) {
     } else {
         throughException(UNKNOWN_KEY_EXCEPTION);
     }
+
+
+    printf("Spend: %ld ms\n", spendTime);
     free(requiredKey);
     return SUCCESS_RESPONSE;
 }
@@ -159,6 +187,7 @@ ResponsesTypes searchItemSpecial(Node **treeRoot) {
         return SUCCESS_RESPONSE;
     }
 
+    clock_t startTime = clock();
     Vector *maxNodeArray = getMaxNodeArray(*treeRoot);
     Vector *minNodeArray = getMinNodeArray(*treeRoot);
     Vector *printingNodes = NULL;
@@ -223,6 +252,7 @@ ResponsesTypes searchItemSpecial(Node **treeRoot) {
         destroyVector(dif2);
         destroyVector(dif1);
     }
+    clock_t spendTime = (clock() - startTime) * 1000 / CLOCKS_PER_SEC;
 
     if (printingNodes != NULL) {
         if (printingNodes->arrayLength == 1) {
@@ -238,16 +268,41 @@ ResponsesTypes searchItemSpecial(Node **treeRoot) {
             }
             printf("]\n");
         }
-        printSuccessMessage(SUCCESS_RESPONSE);
         destroyVector(printingNodes);
     } else throughException(UNKNOWN_KEY_EXCEPTION);
 
+
+    printf("Spend: %ld ms\n", spendTime);
     free(requiredKey);
+    printSuccessMessage(SUCCESS_RESPONSE);
     return SUCCESS_RESPONSE;
 }
 
 ResponsesTypes printTree(Node **treeRoot) {
     printTreeLevel(*treeRoot, 1);
+    return SUCCESS_RESPONSE;
+}
+
+ResponsesTypes printTreeInGraphViz(Node **treeRoot) {
+
+    if (treeRoot == NULL) {
+        throughException(EMPTY_FIELD_EXCEPTION);
+        return SUCCESS_RESPONSE;
+    }
+
+    FILE *fp;
+
+    fp = fopen("files/treeDiagram.dot", "w+");
+    if (fp == NULL) {
+        throughException(FILE_EXCEPTION);
+        return SUCCESS_RESPONSE;
+    }
+    printTreeGraphVis(*treeRoot, fp);
+    fclose(fp);
+
+    system("dot -Tpng files/treeDiagram.dot -o files/tree.png");
+    // system();
+
     return SUCCESS_RESPONSE;
 }
 

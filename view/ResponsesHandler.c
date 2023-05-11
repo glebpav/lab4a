@@ -23,6 +23,8 @@ char *getResponseMessage(ResponsesTypes responsesTypes) {
             return strdup("stupid error");
         case SUCCESS_RESPONSE:
             return strdup("success!");
+        case FILE_EXCEPTION:
+            return strdup("error occurred with your file");
         default:
             return strdup("unknown message");
     }
