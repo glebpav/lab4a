@@ -49,8 +49,7 @@ ResponsesTypes readFile(char *fileName, char ***outputString, int *outputStringL
 
 ResponsesTypes getTreeFromString(char **stringArray, int stringArrayLen, Node **treeRoot) {
 
-    printf("address of string array: %p\n", stringArray);
-
+    // printf("address of string array: %p\n", stringArray);
     if (stringArrayLen % 2 != 0) return INCORRECT_FILE_FORMAT_EXCEPTION;
 
     for (int i = 0; i < stringArrayLen; i+=2) {

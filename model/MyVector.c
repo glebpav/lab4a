@@ -18,7 +18,7 @@ Vector *initVectorPtr(int typeSize) {
 void addItemToVector(Vector *vector, void *item) {
     vector->arrayLength += 1;
     vector->array = realloc(vector->array, sizeof(void *) * vector->arrayLength);
-    printf("size of Item: %llu\n", sizeof(*item));
+    // printf("size of Item: %llu\n", sizeof(*item));
     vector->array[vector->arrayLength - 1] = calloc(1, vector->typeSize);
     memcpy(vector->array[vector->arrayLength - 1], item, vector->typeSize);
 }

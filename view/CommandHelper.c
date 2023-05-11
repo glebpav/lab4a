@@ -30,7 +30,7 @@ ResponsesTypes deleteItem(Node **treeRoot) {
     if (!getSaveStingValue(&deletingNodeKey, "Please, input KEY of deleting Node\n"))
         return EXIT_RESPONSE;
 
-    Vector *arrayOfDeletingNodes = getNode(treeRoot, deletingNodeKey);
+    Vector *arrayOfDeletingNodes = getNode(treeRoot, deletingNodeKey, true);
     free(deletingNodeKey);
     Node **deletingItemPtr = NULL;
 
@@ -40,11 +40,16 @@ ResponsesTypes deleteItem(Node **treeRoot) {
     }
     if (arrayOfDeletingNodes->arrayLength != 1) {
         int groupItemIdx;
-        if (!getSaveIntValue(&groupItemIdx, "Please, input IDX of deleting Item\n"))
+        if (!getSaveIntValue(&groupItemIdx, "Please, input IDX of deleting Item\n")) {
+            destroyVector(arrayOfDeletingNodes);
             return EXIT_RESPONSE;
-        if (groupItemIdx < 0 || groupItemIdx >= arrayOfDeletingNodes->arrayLength){
+        }
+        while (groupItemIdx < 0 || groupItemIdx >= arrayOfDeletingNodes->arrayLength) {
             throughException(INPUT_NOT_IN_RANGE_EXCEPTION);
-            return SUCCESS_RESPONSE;
+            if (!getSaveIntValue(&groupItemIdx, "Please, input IDX of deleting Item\n")) {
+                destroyVector(arrayOfDeletingNodes);
+                return EXIT_RESPONSE;
+            }
         }
 
         deletingItemPtr = getItemFromVector(*arrayOfDeletingNodes, groupItemIdx);
@@ -74,17 +79,22 @@ ResponsesTypes directBypassCommand(Node **treeRoot) {
 }
 
 ResponsesTypes directBypassSpecial(Node **treeRoot) {
+
+    char *subStr;
+
+    if (!getSaveStingValue(&subStr, "Please, input SUBSTR for key\n"))
+        return EXIT_RESPONSE;
+
     return SUCCESS_RESPONSE;
 }
 
 ResponsesTypes searchItem(Node **treeRoot) {
-
     char *requiredKey;
 
     if (!getSaveStingValue(&requiredKey, "Please, input required KEY\n"))
         return EXIT_RESPONSE;
 
-    Vector *foundNodeArray = getNode(treeRoot, requiredKey);
+    Vector *foundNodeArray = getNode(treeRoot, requiredKey, true);
 
     if (foundNodeArray != NULL) {
         if (foundNodeArray->arrayLength == 1) {
@@ -108,6 +118,75 @@ ResponsesTypes searchItem(Node **treeRoot) {
 }
 
 ResponsesTypes searchItemSpecial(Node **treeRoot) {
+    char *requiredKey;
+
+    if (!getSaveStingValue(&requiredKey, "Please, input required KEY\n"))
+        return EXIT_RESPONSE;
+
+    if (treeRoot == NULL || *treeRoot == NULL) {
+        throughException(EMPTY_FIELD_EXCEPTION);
+        return SUCCESS_RESPONSE;
+    }
+
+    Vector *maxNodeArray = getMaxNodeArray(*treeRoot);
+    Vector *minNodeArray = getMinNodeArray(*treeRoot);
+    Vector *printingNodes = NULL;
+
+    if (maxNodeArray == NULL && minNodeArray == NULL) {
+        throughException(COMMON_EXCEPTION);
+        destroyVector(maxNodeArray);
+        destroyVector(minNodeArray);
+        free(requiredKey);
+        return SUCCESS_RESPONSE;
+    } else if (maxNodeArray == NULL) printingNodes = minNodeArray;
+    else if (minNodeArray == NULL) printingNodes = maxNodeArray;
+    else {
+        Node *nodeMin = getItemFromVector(*minNodeArray, 0);
+        Node *nodeMax = getItemFromVector(*maxNodeArray, 0);
+        Vector *dif1 = getStringDifference(requiredKey, nodeMin->key);
+        Vector *dif2 = getStringDifference(requiredKey, nodeMax->key);
+
+        int difIdx = 0;
+        int finalDif = 0;
+        while (dif1->arrayLength < difIdx && dif2->arrayLength < difIdx) {
+            int *item1 = getItemFromVector(*dif1, difIdx);
+            int *item2 = getItemFromVector(*dif2, difIdx);
+            finalDif = *item1 - *item2;
+            difIdx += 1;
+            if (finalDif != 0) break;
+        }
+
+        if (finalDif > 0) {
+            printingNodes = minNodeArray;
+            destroyVector(maxNodeArray);
+        } else {
+            printingNodes = maxNodeArray;
+            destroyVector(minNodeArray);
+        }
+
+        destroyVector(dif2);
+        destroyVector(dif1);
+    }
+
+    if (printingNodes != NULL) {
+        if (printingNodes->arrayLength == 1) {
+            Node *node = getItemFromVector(*printingNodes, 0);
+            printf("The further Node is:\n");
+            printf("key = %s  data = %s\n", node->key, node->data);
+        } else {
+            printf("The further Nodes are:\n");
+            printf("key = %s  data: [ ", requiredKey);
+            for (int i = 0; i < printingNodes->arrayLength; ++i) {
+                Node *node = getItemFromVector(*printingNodes, i);
+                printf("%s; ", node->data);
+            }
+            printf("]\n");
+        }
+        printSuccessMessage(SUCCESS_RESPONSE);
+        destroyVector(printingNodes);
+    } else throughException(UNKNOWN_KEY_EXCEPTION);
+
+    free(requiredKey);
     return SUCCESS_RESPONSE;
 }
 
@@ -133,11 +212,8 @@ ResponsesTypes readTreeFromFile(Node **treeRoot) {
     char **stringArray = NULL;
     ResponsesTypes response;
 
-    response = getSaveStingValue(&fileName, "Input name of file\n");
-    if (isException(response)) {
-        throughException(response);
-        return response;
-    }
+    response = getSaveStingValue(&fileName, "Please, input file NAME\n");
+    if (fileName == NULL) return SUCCESS_RESPONSE;
 
     response = readFile(fileName, &stringArray, &stringArrayLen);
     free(fileName);

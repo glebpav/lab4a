@@ -16,7 +16,7 @@ int selectOperation(const char *commandsMessages[], int countOfMessages) {
         printf("%.*s|\n", 40 - strlen(commandsMessages[i]), "                                                     ");
         printf(" +------------------------------------------+\n");
     }
-    printf("Select one command out of given:\n");
+    printf("\nSelect one command out of given:\n>> ");
     do {
         if (getSaveIntValue(&userInput, "") == EXIT_RESPONSE) return getExitOperationIdx();
         if (userInput > countOfMessages || userInput <= 0) throughException(INPUT_NOT_IN_RANGE_EXCEPTION);
