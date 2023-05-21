@@ -111,6 +111,13 @@ ResponsesTypes addNode(Node **treeRoot, char *key, char *value) {
     }
 
     while (selectedNode != NULL) {
+
+        while (selectedNode->right != NULL
+               && strcmp(selectedNode->key, key) != 0
+               && strcmp(selectedNode->key, selectedNode->right->key) == 0) {
+            selectedNode = selectedNode->right;
+        }
+
         previousNode = selectedNode;
         comparisonResult = strcmp(selectedNode->key, value);
         if (comparisonResult > 0) {
@@ -135,7 +142,15 @@ ResponsesTypes addNode(Node **treeRoot, char *key, char *value) {
 ResponsesTypes deleteNode(Node **deletingNodePtr) {
 
     Node *deletingNode = *deletingNodePtr;
-    // TODO: in case node is root ...
+
+    if (deletingNode->parent != NULL && strcmp(deletingNode->parent->key, deletingNode->key) == 0) {
+        free(deletingNode->data);
+        free(deletingNode->key);
+        deletingNode->data = strdup(deletingNode->parent->data);
+        deletingNode->key = strdup(deletingNode->parent->key);
+        deleteNode(&(deletingNode->parent));
+        return SUCCESS_RESPONSE;
+    }
 
     // in case NO child nodes
     if (deletingNode->right == NULL && deletingNode->left == NULL && deletingNode->parent != NULL) {

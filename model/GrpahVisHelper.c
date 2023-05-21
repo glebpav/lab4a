@@ -8,7 +8,6 @@ int getNodeCount() {
     return nodeCount;
 }
 
-
 void printNullNode(int nullCount, FILE *stream) {
     fprintf(stream, "   node%d [shape=point, label=\"<key>\"];\n", nullCount);
     // if (leftOrRight) fprintf(stream, "    node%d:left -> node%d:key;\n", nodeIdx, nullCount);
@@ -44,7 +43,7 @@ void printTreeGraphVis(Node *tree, FILE *stream) {
 
     fprintf(stream, "digraph {\n");
     fprintf(stream,
-                    "   node [style=rounded]\n");
+            "   node [style=rounded]\n");
 
     if (!tree) fprintf(stream, "\n");
     else if (!tree->right && !tree->left) fprintf(stream, "    %s;\n", tree->key);

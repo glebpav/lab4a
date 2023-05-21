@@ -255,18 +255,12 @@ ResponsesTypes searchItemSpecial(Node **treeRoot) {
     clock_t spendTime = (clock() - startTime) * 1000 / CLOCKS_PER_SEC;
 
     if (printingNodes != NULL) {
-        if (printingNodes->arrayLength == 1) {
-            Node *node = getItemFromVector(*printingNodes, 0);
-            printf("The further Node is:\n");
-            printf("key = %s  data = %s\n", node->key, node->data);
-        } else {
-            printf("The further Nodes are:\n");
-            printf("key = %s  data: [ ", requiredKey);
+        if (printingNodes->arrayLength != 0) {
             for (int i = 0; i < printingNodes->arrayLength; ++i) {
                 Node *node = getItemFromVector(*printingNodes, i);
-                printf("%s; ", node->data);
+                printf("The further Node is:\n");
+                printf("key = %s  data = %s\n", node->key, node->data);
             }
-            printf("]\n");
         }
         destroyVector(printingNodes);
     } else throughException(UNKNOWN_KEY_EXCEPTION);
@@ -301,7 +295,7 @@ ResponsesTypes printTreeInGraphViz(Node **treeRoot) {
     fclose(fp);
 
     system("dot -Tpng files/treeDiagram.dot -o files/tree.png");
-    // system();
+    system("catimg files/tree.png");
 
     return SUCCESS_RESPONSE;
 }
